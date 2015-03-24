@@ -1,4 +1,4 @@
-function [ turnInstructions, moveInstructions, plan ] = PathPlan( currentPos,currentAng,ParticlesSubset,target,map,previousPlan,fMap )
+function [ moveInstructions, turnInstructions, plan ] = PathPlan( currentPos,currentAng,ParticlesSubset,target,map,previousPlan,fMap )
 % [mean(ParticlesArray(:,Param.XCoord : Param.YCoord))], mean(ParticlesArray(:,Param.Orientation)),ParticlesSubset
 % stateChange is a variable containing the information needed to make the
 % next movement:
@@ -11,22 +11,27 @@ figure(fMap);
 %lines=[map circshift(map,-1)];
 
 %drawLines( lines,'k' );
+% ParticlesArray=zeros(size(ParticlesSubset,1),3);
+% for i = 1:size(ParticlesArray,1)
+%     ParticlesArray(i,1:2)= ParticlesSubset(i).getBotPos();
+%     ParticlesArray(i,3) = ParticlesSubset(i).getBotAng();
+% end
 
 if debug
-    plot(target(1),target(2),'r.','MarkerSize',20);
-    plot(currentPos(1),currentPos(2),'g.','MarkerSize',20);
+    plot(target(1),target(2),'g*','MarkerSize',20);
+    plot(currentPos(1),currentPos(2),'ro');
+    plot([currentPos(1) currentPos(1)+cos(currentAng)*10],...
+        [currentPos(2) currentPos(2)+sin(currentAng)*10],'r');
+
 end
 
 % If the previous plan is null, then is the first iteration. In this case
 % everything has to be calculated.
 if ~isstruct(previousPlan)
-    % Calculate heuristics (distance to target in straight line)
-    %heuristics=[map;currentPos];
-    %heuristics(:,3)=calcHeuristics(heuristics,target);
     % Calculate target visibility
     targetVisibleCorners=getVisibleCorners( target, map, target );
     if debug
-        drawLines( targetVisibleCorners,'r' );
+        myDrawLines( targetVisibleCorners,'g','--' );
     end
     % Calculate full map visibility
     [mapVisibleCorners,maxSafetyHypotenuse]=getMapVisibleCorners( map );
@@ -56,7 +61,7 @@ nodeCost=2;
 % Calculate current position visibility
 currPosVisibleCorners=getVisibleCorners( currentPos, map, target );
 if debug
-    drawLines( currPosVisibleCorners,'g' );
+    myDrawLines( currPosVisibleCorners,'r', ':' );
 end
 
 % ...and the shortest way to target 
@@ -105,8 +110,8 @@ while plan.optimalPath(size(plan.optimalPath,1),5) > 0
 end
 
 if debug
-    drawLines( plan.optimalPath(:,1:4),'m' );
-    drawLines( plan.safetyPath(:,1:4),'b' );
+    myDrawLines( plan.optimalPath(:,1:4),'m', '-.' );
+    myDrawLines( plan.safetyPath(:,1:4),'b', '-' );
 end
 
 % Last step: create the movements
@@ -122,18 +127,14 @@ if size(plan.safetyPath,1) == 2 && isequal(plan.safetyPath(1, 1:2),...
 end
 % Remove the last 'NaN NaN' from movement vectors
 movementVectors(size(movementVectors,1),:)=[];
-robotAngles=vectorAngle(movementVectors);
-robotAngles(1)=robotAngles(1)-currentAng*180/pi;
-% turnInstructions=zeros(size(plan.optimalPath,1),1);
-turnInstructions=robotAngles(1)*pi/180;
-%moveInstructions=zeros(size(movementVectors,1),1);
-% for i=1:size(movementVectors,1)
-%     value=norm(movementVectors(i,:));
-%     moveInstructions(i)=value;
-% end
 
-value=norm(movementVectors(1,:));
-moveInstructions=value;
+%Calculate the turn angle
+robotAngles=vectorAngle(movementVectors);
+turnInstructions=angleDifference( robotAngles(1), currentAng*180/pi );
+turnInstructions=turnInstructions*pi/180;
+
+moveInstructions=norm(movementVectors(1,:));
+
 
 end
 

@@ -1,9 +1,9 @@
-function [ParticlesOut, ParticlesArrayOut]=Populate (ParticlesIn, ParticlesArrayIn, Iteration, Param)
+function [ParticlesOut, ParticlesArrayOut]=Populate (ParticlesIn, ParticlesArrayIn, Iteration, Param, RobotScan)
 ParticlesOut=ParticlesIn;
 ParticlesArrayOut=ParticlesArrayIn;
 if Iteration == 1 
     for i = 1:size(ParticlesOut,1)
-        ParticlesOut(i).randomPose(0); 
+        ParticlesOut(i).randomPose(Param.minDistanceToWallWeigth*min(RobotScan)); 
         ParticlesOut(i).setBotAng(2*pi*rand);
         ParticlesArrayOut(i,Param.XCoord:Param.YCoord)= ParticlesOut(i,1).getBotPos();
         ParticlesArrayOut(i, Param.Orientation) = ParticlesOut(i,1).getBotAng();

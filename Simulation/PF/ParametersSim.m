@@ -7,15 +7,17 @@ PerK = 1E-30;
 PerRot = 100*NumParticles;
 MaxIterations = 30;
 %Navegation
-PerTransm = 75;
+PerTransm = 90;
 InTgtThd = 4;   %In target decission
 %Noise in measurement
-SimSdvMeas = 1;
+SimSdvMeas = 1.5;
+SimSdvMeasConverged = 0.7;
 SdvTrns = 0.1;    %Sdev of translation movement
 SdvOffset = 0;   %Offset of translation movement
-SdvRot = 0.2;      %Sdev of rotation
+SdvRot = 0.2*pi/180;      %Sdev of rotation: changed to 0.2 degrees instead of 0.2 rad (11 degrees!)
 SimAntiNoise = 1;          %Scan repetitions to supress noise effect
 Figure = 1;
+minDistanceToWallWeigth = 0.7;
 %Labels to reference particle data array column
 XCoord = 1;
 YCoord = 2;
@@ -39,6 +41,7 @@ ParamPopulate.XCoord = XCoord;
 ParamPopulate.YCoord =YCoord;
 ParamPopulate.Orientation = Orientation;
 ParamPopulate.Weight = Weight;
+ParamPopulate.minDistanceToWallWeigth = minDistanceToWallWeigth;
 %Parameters for LocationMove
 ParamLocationMove.PerDecMov = PerDecMov;
 ParamLocationMove.ScanRays = ScanRays;
@@ -53,6 +56,7 @@ ParamMove.Orientation = Orientation;
 ParamCheckInMap.XCoord = XCoord;
 ParamCheckInMap.YCoord = YCoord;
 ParamCheckInMap.Orientation = Orientation;
+ParamCheckInMap.minDistanceToWallWeigth = minDistanceToWallWeigth;
 %Parameters for Ultrascan
 ParamUScan.ScanRays = ScanRays;
 ParamUScan.SimAntiNoise = SimAntiNoise;
@@ -61,6 +65,7 @@ ParamUWeight.PerK = PerK;
 ParamUWeight.PerRot = PerRot;
 ParamUWeight.ScanRays = ScanRays;
 ParamUWeight.SimSdvMeas = SimSdvMeas;
+ParamUWeight.SimSdvMeasConverged = SimSdvMeasConverged;
 ParamUWeight.SdvTrns = SdvTrns;
 ParamUWeight.SdvOffset = SdvOffset;
 ParamUWeight.SdvRot = SdvRot;
